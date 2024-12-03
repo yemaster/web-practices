@@ -6,8 +6,4 @@
 
 ## 附件下载
 
-[archive.zip](./web0/shell/archive.zip)
-
-## 题目源码
-
-[web0/shell](./web0/shell)
+[archive.zip](./archive.zip)
