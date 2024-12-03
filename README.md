@@ -2,21 +2,25 @@
 
 CTF web 新手从零练习题库的源代码（包括题目附件和 Dockerfile）。
 
-[**在线训练**](https://ctf.u5tc.cn)
+**在线训练平台**：[https://ctf.u5tc.cn](https://ctf.u5tc.cn)。另外，每个专题都放置了具体的训练链接，如果出 404 啥的就说明题目下架了，反正源码都在了，自己本地训练也是很方便的。
 
-一般来说，附件题中的 `archive.zip` 是题目下载的附件，然后其余文件是题目的源代码。容器题目的 `xxxx.tar` 是容器打包后的文件，其余文件是题目的源代码。
+每个题目下面都会放一个 `README.md` 来介绍题目的信息。一般来说，附件题中的 `archive.zip` 是题目下载的附件，然后其余文件是题目的源代码。容器题目的 `xxxx.tar` 是容器打包后的文件，其余文件是题目的源代码。
 
 部分题目因为题目描述不清等原因在之后可能会更新，另外之后可能会补充题目的题解。
 
 ## 目录
 
+这里只放题目的名称，具体题目信息请点入具体的题目文件夹中的 `README.md` 来进行查看。
+
 ### Web0-基础环境搭建
 
-- 跑个 Shell 看看
-- 跑个 PHP 看看
-- 跑个 Python 看看
-- 跑个 JavaScript 看看
-- 跑个 Docker 看看
+在线练习：[Web0-基础环境搭建](https://ctf.u5tc.cn/games/4)
+
+- [跑个 Shell 看看](./web0/shell)
+- [跑个 PHP 看看](./web0/php)
+- [跑个 Python 看看](./web0/python)
+- [跑个 JavaScript 看看](./web0/js)
+- [跑个 Docker 看看](./web0/docker)
 
 ### Web1-敏感信息泄露
 
