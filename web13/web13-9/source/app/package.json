@@ -1,0 +1,15 @@
+{
+  "name": "web13-9",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "yemaster",
+  "license": "MIT",
+  "description": "Abstrax CTF web13-9",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}
