@@ -1,0 +1,94 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    paths:
+      - '*/**/*' # Trigger on changes to any file in second-level folders
+      - '!*/README.md' # Ignore changes to README files in chapter folders
+      - '!*.md' # Ignore changes to top-level markdown files
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Get changed files
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            */**/*
+          files_ignore: |
+            **/README.md
+            *.md
+          json: true
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to the container registry
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-control.abstrax.cn
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Extract unique problem folders from changed files
+      - name: Extract problem folders
+        id: changed-folders
+        run: |
+          changed="${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "RAW changed files: >>>$changed<<<" >&2
+
+          problem_folders=$(echo "$changed" | jq -r '.[]' | while read -r file; do
+              if [[ $file =~ ^web[0-9]+-[^/]+/[0-9]+-[^/]+ ]]; then
+                  # 提取匹配的文件夹路径部分
+                  echo "$file" | sed -E 's|^(web[0-9]+-[^/]+/[0-9]+-[^/]+).*$|\1|'
+              fi
+          done | sort -u | jq -R . | jq -s -c .)
+
+          echo "Extracted problem folders: $problem_folders" >&2
+          escaped_problem_folders=$(echo "$problem_folders" | sed 's/"/\\"/g')
+
+          echo "problem_folders=$escaped_problem_folders" >> $GITHUB_OUTPUT
+        shell: bash
+
+      # Process each changed problem folder
+      - name: Build and push Docker images
+        env:
+          REGISTRY: registry-control.abstrax.cn
+        run: |
+          # Loop through changed problem folders
+          problem_folders="${{ steps.changed-folders.outputs.problem_folders }}"
+          echo "Processing problem folders: $problem_folders" >&2
+          echo "$problem_folders" | jq -r '.[]' | while IFS= read -r folder; do
+            config_file="$folder/config.yaml"
+            echo "Processing folder: $folder" >&2
+            if [ -f "$config_file" ]; then
+              # Check if the problem type is docker
+              is_docker=$(yq '.type == "docker"' "$config_file")
+              if [ "$is_docker" = "true" ]; then
+                # Extract chapter and problem numbers (e.g., web1-xxx -> 1, 1-xxx -> 1)
+                chapter=$(echo "$folder" | cut -d'/' -f1 | grep -oE 'web[0-9]+' | sed 's/web//')
+                problem=$(echo "$folder" | cut -d'/' -f2 | grep -oE '^[0-9]+')
+                image_name="yemaster/web$chapter-$problem"
+                echo "Building Docker image for $folder ($image_name)"
+                
+                # Build and push Docker image
+                docker build -t "$REGISTRY/$image_name" "$folder/challenge"
+                docker push "$REGISTRY/$image_name"
+              else
+                echo "Skipping $folder: Not a docker type"
+              fi
+            else
+              echo "Skipping $folder: No config.yaml found"
+            fi
+          done
+        if: steps.changed-folders.outputs.problem_folders != ''
