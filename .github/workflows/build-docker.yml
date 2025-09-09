@@ -62,9 +62,13 @@ jobs:
 
       # Process each changed problem folder
       - name: Build and push Docker images
+        id: build-and-push
+        if: steps.changed-folders.outputs.problem_folders != '[]'
         env:
           REGISTRY: registry-control.abstrax.cn
         run: |
+          images=()
+
           # Loop through changed problem folders
           problem_folders="${{ steps.changed-folders.outputs.problem_folders }}"
           echo "Processing problem folders: $problem_folders" >&2
@@ -84,6 +88,8 @@ jobs:
                 # Build and push Docker image
                 docker build -t "$REGISTRY/$image_name" "$folder/challenge"
                 docker push "$REGISTRY/$image_name"
+
+                images+=("$image_name")
               else
                 echo "Skipping $folder: Not a docker type"
               fi
@@ -91,4 +97,28 @@ jobs:
               echo "Skipping $folder: No config.yaml found"
             fi
           done
-        if: steps.changed-folders.outputs.problem_folders != ''
+        
+          # 传递 images 到下一个步骤
+          if [ ${#images[@]} -eq 0 ]; then
+            images_json="[]"
+          else
+            images_json=$(printf '%s\n' ${images[@]} | jq -R . | jq -s -c .)
+          fi
+          escaped_images_json=$(echo "$images_json" | sed 's/"/\\"/g')
+          echo "images=$escaped_images_json" >> $GITHUB_OUTPUT
+      
+      # Send the notification
+      - name: Send Notification
+        if: steps.rbuild-and-push.outputs.images != '[]'
+        env:
+          API_URL: ${{ secrets.NOTIFY_API_URL }}
+          API_KEY: ${{ secrets.NOTIFY_API_KEY }}
+        run: |
+          images="${{ steps.build-and-push.outputs.images }}"
+          echo "Images to notify: $images" >&2
+          curl -X POST "$API_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $API_KEY" \
+            -d "{\"images\": $images}"
+        shell: bash
+          
