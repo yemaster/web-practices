@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html class="no-js" lang="zh-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>记录的 HTTP 记录</title>
+    <style>
+        .container {
+            width: 80%;
+            min-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        pre {
+            word-break: break-all;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>记录的 HTTP 记录</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>方法</th>
+                    <th>URL</th>
+                    <th>请求头</th>
+                    <th>Cookie</th>
+                    <th>Body</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.method }}</td>
+                    <td>{{ log.url }}</td>
+                    <td><pre>{% for header in log.headers %}<b>{{ header }}</b>: {{ log.headers[header] }}
+{% endfor %}</pre></td>
+                    <td><pre>{% for cookie in log.cookies %}<b>{{ cookie }}</b>: {{ log.cookies[cookie] }}
+{% endfor %}</pre></td>
+                    <td><pre>{{ log.body }}</pre></td>
+                    <td>{{ log.ip }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+</body>
+</html>

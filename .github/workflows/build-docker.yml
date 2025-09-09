@@ -72,20 +72,17 @@ jobs:
           # Loop through changed problem folders
           problem_folders="${{ steps.changed-folders.outputs.problem_folders }}"
           echo "Processing problem folders: $problem_folders" >&2
-          echo "$problem_folders" | jq -r '.[]' | while IFS= read -r folder; do
+          for folder in $(echo "$problem_folders" | jq -r '.[]'); do
             config_file="$folder/config.yaml"
             echo "Processing folder: $folder" >&2
             if [ -f "$config_file" ]; then
-              # Check if the problem type is docker
               is_docker=$(yq '.type == "docker"' "$config_file")
               if [ "$is_docker" = "true" ]; then
-                # Extract chapter and problem numbers (e.g., web1-xxx -> 1, 1-xxx -> 1)
                 chapter=$(echo "$folder" | cut -d'/' -f1 | grep -oE 'web[0-9]+' | sed 's/web//')
                 problem=$(echo "$folder" | cut -d'/' -f2 | grep -oE '^[0-9]+')
                 image_name="yemaster/web$chapter-$problem"
                 echo "Building Docker image for $folder ($image_name)"
                 
-                # Build and push Docker image
                 docker build -t "$REGISTRY/$image_name" "$folder/challenge"
                 docker push "$REGISTRY/$image_name"
 

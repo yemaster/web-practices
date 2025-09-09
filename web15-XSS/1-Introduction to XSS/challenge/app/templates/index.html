@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html class="no-js" lang="zh-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>欢迎来到 yema 的博客</title>
+    <link rel='stylesheet' id='streaming-main-css' href='/static/streaming.min.css?ver=1.0.1' type='text/css'
+        media='all' />
+</head>
+
+<body data-spy="scroll" data-target=".scrollspy">
+    <section class="ax-banner" style="background-image: url(/static/background.jpg)">
+        <div class="ax-banner__text">欢迎来到 yema 的博客</div>
+    </section>
+    <section class="ax-main">
+        <div class="ax-main__left article">
+            <div class="ax-card">
+                <h2 class="ax-card-title">我的新博客，纯自研</h2>
+                <div class="ax-card-meta">
+                    <div>发布于：2099-12-31</div>
+                    <div>观看：114514</div>
+                </div>
+                <div class="ax-divider"></div>
+                <div class="article-main" id="article-main">
+                    <h2>介绍</h2>
+                    <p>这是我的新博客，我还特别开启了评论系统，你可以在评论区自由地发表你的想法！评论区没有任何过滤哦~为了让我快点看到你的评论，请点击下方按钮！！</p>
+                    <p><button class="ax-comment-send-button" onclick="bot_view_comment()">快点看评论！</button></p>
+                    <h2 style="color: #db2828">特别重磅</h2>
+                    <p>你对 XSS 不太熟悉？我们为你贴心准备了一系列工具！这些工具仅在这一题中会介绍，你可以在下方的工具卡片中找到</p>
+                    <h3>请求记录工具</h3>
+                    <p>向 <code>/record_log</code> 发送请求，系统会自动记录请求，你可以在 <a href="/log_list" target="_blank"><code>/log_list</code></a> 查看最后 10 条请求的请求信息，包括请求方法、请求 URL、请求头、COOKIE、请求体和请求 IP。</p>
+                    <h3>自定义的 evil.js</h3>
+                    <p>访问 <a href="/set_evil_js" target="_blank"><code>/set_evil_js</code></a>，你可以自由编辑内容，<a href="/evil.js" target="_blank"><code>/evil.js</code></a> 将会同步你输入的内容！</p>
+                </div>
+            </div>
+
+            <div class="ax-card">
+                <div class="ax-card-title-small">工具</div>
+                <div class="ax-divider"></div>
+                <p>请求接收地址：<code>/record_log</code></p>
+                <p>请求记录查看地址：<a href="/log_list" target="_blank"><code>/log_list</code></a></p>
+                <p>自定义 evil.js 地址：<a href="/set_evil_js" target="_blank"><code>/set_evil_js</code></a></p>
+                <p>evil.js 访问地址：<a href="/evil.js" target="_blank"><code>/evil.js</code></a></p>
+                <p>让 yema 浏览评论：<a href="javascript:;" onclick="bot_view_comment()">点击此链接</a></p>
+            </div>
+
+            <div class="ax-card">
+                <div class="ax-card-title-small">评论</div>
+                <div class="ax-divider"></div>
+                <div id="comments" class="comments-area">
+                    {% for comment in comments %}
+                    <div id="comment-22" class="ax-comment depth-1 parent odd">
+                        <div class="ax-comment-header">
+                            <img class="ax-comment-avatar" src="/static/imglogo.jpg">
+                            <div class="ax-comment-info">
+                                <div class="ax-comment-author">{{ comment[0] }}</div>
+                                <div class="ax-comment-meta">发布于 2024-11-27 | <a class="comment-reply-link"
+                                        href="javascript:;"
+                                        rel="nofollow">回复</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ax-comment-body">
+                            <p>{{ comment[1] | safe }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="comment-respond">
+                    <h4 id="reply-title" class="ax-comment-reply-title">发表评论</h4>
+                    <form class="comment-form" onsubmit="submitComment(event)">
+                        <div class="comment-form-author form-group has-feedback">
+                            <div class="ax-comment-input-group">
+                                <label for="author">你的昵称 (*)</label>
+                                <input class="ax-comment-input" placeholder="昵称" id="author" name="author" type="text"
+                                    value="" size="30">
+                            </div>
+                        </div>
+                        <div class="comment form-group has-feedback">
+                            <div class="ax-comment-input-group">
+                                <label for="text">你的评论 (*)</label>
+                                <textarea class="ax-comment-input" id="comment" placeholder=" " name="text" rows="5"
+                                    aria-required="true" required=""
+                                    onkeydown="if(event.ctrlKey){if(event.keyCode==13){document.getElementById('submit').click();return false}};"></textarea>
+                            </div>
+                        </div>
+                        <p class="form-submit">
+                            <input name="submit" type="submit" id="submit" class="ax-comment-send-button" value="发表评论">
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="ax-footer">
+        <div class="ax-footer-bottom">
+            <div class="ax-footer-bottom__left">
+                &copy; 2025 <b>我的新博客</b>. All Rights Reserved.<br>
+                Powered by <b>强大的自研博客系统</b>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function submitComment(event) {
+            event.preventDefault();
+            const author = document.getElementById('author').value;
+            const text = document.getElementById('comment').value;
+            if (author === '' || text === '') {
+                alert('请填写昵称和评论内容');
+                return;
+            }
+            const commentFormData = new FormData();
+            commentFormData.append('username', author);
+            commentFormData.append('comment', text);
+            fetch("/add_comment", {
+                method: "POST",
+                body: commentFormData
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        location.reload();
+                    } else {
+                        alert('评论提交失败: ' + data.message);
+                    }
+                });
+        }
+
+        function bot_view_comment() {
+            fetch("/bot", {
+                method: "POST"
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('好的，yema 马上就去看评论！');
+                    } else {
+                        alert(data.message);
+                    }
+                }).catch(error => {
+                    alert('请求失败: ' + error);
+                });
+        }
+    </script>
+</body>
+
+</html>
