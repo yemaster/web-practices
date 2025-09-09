@@ -5,6 +5,7 @@ import time
 import asyncio
 import json
 import os
+import tempfile
 
 app = Quart(__name__)
 flag = "flag{test_flag}"
@@ -108,14 +109,20 @@ def _run_selenium():
     global running
     try:
         options = webdriver.ChromeOptions()
-        options.binary_location = CHROME_EXECUTABLE_PATH
+        # options.binary_location = CHROME_EXECUTABLE_PATH
+        options.add_argument('--no-sandbox')
         options.add_argument('--headless')
-        service = webdriver.ChromeService(executable_path=CHROME_DRIVER_PATH)
-        driver = webdriver.Chrome(options=options, service=service)
+        options.add_argument('--disable-gpu')
+        user_data_dir = tempfile.mkdtemp()
+        options.add_argument(f'--user-data-dir={user_data_dir}')
+        options.add_argument('--disable-dev-shm-usage')
+        # service = webdriver.ChromeService(executable_path=CHROME_DRIVER_PATH)
+        # driver = webdriver.Chrome(options=options, service=service)
+        driver = webdriver.Chrome(options=options)
         driver.get('http://web/info')
         cookie = {
             'name': 'flag',
-                'value': flag,
+            'value': flag,
             'path': '/',
             'httpOnly': False,
             'secure': False
@@ -125,6 +132,8 @@ def _run_selenium():
         time.sleep(5)
         driver.quit()
         print("BOT Finish")
+    except Exception as e:
+        print(f"Error in _run_selenium: {e}")
     finally:
         running = False
 
