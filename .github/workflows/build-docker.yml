@@ -110,7 +110,7 @@ jobs:
       
       # Send the notification
       - name: Send Notification
-        if: steps.build-and-push.outputs.images != '[]'
+        if: steps.build-and-push.outputs.images != '[]' && steps.build-and-push.outputs.images != ''
         env:
           API_URL: ${{ secrets.NOTIFY_API_URL }}
           API_KEY: ${{ secrets.NOTIFY_API_KEY }}

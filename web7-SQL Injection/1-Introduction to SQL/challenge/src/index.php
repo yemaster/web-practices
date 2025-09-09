@@ -1,4 +1,5 @@
 <?php 
+include "connect.php";
 if (isset($_GET["sql"])) {
     $sql = $_GET["sql"];
     header('Content-Type: application/json');
