@@ -104,12 +104,13 @@ jobs:
           else
             images_json=$(printf '%s\n' ${images[@]} | jq -R . | jq -s -c .)
           fi
+          echo "Built and pushed images: $images_json" >&2
           escaped_images_json=$(echo "$images_json" | sed 's/"/\\"/g')
           echo "images=$escaped_images_json" >> $GITHUB_OUTPUT
       
       # Send the notification
       - name: Send Notification
-        if: steps.rbuild-and-push.outputs.images != '[]'
+        if: steps.build-and-push.outputs.images != '[]'
         env:
           API_URL: ${{ secrets.NOTIFY_API_URL }}
           API_KEY: ${{ secrets.NOTIFY_API_KEY }}
