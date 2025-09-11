@@ -78,8 +78,8 @@ jobs:
             if [ -f "$config_file" ]; then
               is_docker=$(yq '.type == "docker"' "$config_file")
               if [ "$is_docker" = "true" ]; then
-                chapter=$(echo "$folder" | cut -d'/' -f1 | grep -oE 'web[0-9]+' | sed 's/web//')
-                problem=$(echo "$folder" | cut -d'/' -f2 | grep -oE '^[0-9]+')
+                chapter=$(echo "$folder" | cut -d'/' -f1 | grep -oE 'web[0-9a-zA-Z_]+' | sed 's/web//')
+                problem=$(echo "$folder" | cut -d'/' -f2 | grep -oE '^[0-9a-zA-Z_]+')
                 image_name="yemaster/web$chapter-$problem"
                 echo "Building Docker image for $folder ($image_name)"
                 
