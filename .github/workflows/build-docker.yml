@@ -36,7 +36,7 @@ jobs:
       - name: Log in to registry
         uses: docker/login-action@v3
         with:
-          registry: registry-control.abstrax.cn
+          registry: registry-control-global.abstrax.cn
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -65,7 +65,7 @@ jobs:
         id: build-and-push
         if: steps.changed-folders.outputs.problem_folders != '[]'
         env:
-          REGISTRY: registry-control.abstrax.cn
+          REGISTRY: registry-control-global.abstrax.cn
         run: |
           images=()
 
