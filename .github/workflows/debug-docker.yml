@@ -1,0 +1,46 @@
+name: Debug Docker Auth
+
+on:
+  workflow_dispatch:  # 手动触发
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry-control-global.abstrax.cn
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Show docker login status
+        run: |
+          echo "=== docker system info (username) ==="
+          docker system info | grep Username || echo "No username found"
+
+          echo -e "\n=== contents of ~/.docker/config.json ==="
+          cat ~/.docker/config.json || echo "No docker config found"
+
+          echo -e "\n=== check /v2/ ping ==="
+          curl -i https://registry-control-global.abstrax.cn/v2/ || echo "curl failed"
+
+      - name: Build a test image
+        run: |
+          echo "FROM alpine:3.19" > Dockerfile
+          echo "RUN echo 'hello from CI' > /hello.txt" >> Dockerfile
+
+          IMAGE=registry-control-global.abstrax.cn/test/debug-ci:latest
+          echo "Building $IMAGE"
+          docker build -t $IMAGE .
+
+          echo "Images after build:"
+          docker images | grep test || true
+
+      - name: Push test image
+        run: |
+          IMAGE=registry-control-global.abstrax.cn/test/debug-ci:latest
+          echo "Pushing $IMAGE"
+          docker push $IMAGE || echo "Push failed"
