@@ -1,0 +1,6 @@
+title: \[CVE-2021-43008\] Adminer Fileread
+description: CVE-2021-43008
+difficulty: Easy
+type: docker
+updated: 2025-09-17 23:16
+author: vulhub
