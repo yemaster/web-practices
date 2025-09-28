@@ -1,0 +1,4 @@
+flask
+python_jwt==3.3.3
+jwcrypto
+gunicorn
