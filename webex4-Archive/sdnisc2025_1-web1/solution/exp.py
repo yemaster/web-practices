@@ -3,7 +3,7 @@ from json import *
 from python_jwt import *
 from jwcrypto import jwk
 
-BACKEND_URL = "http://localhost:12333"
+BACKEND_URL = "http://container.ctf.abstrax.cn:30148/"
 
 jwt = requests.post(f"{BACKEND_URL}/login", json={
     "username": "guest",
