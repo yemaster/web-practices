@@ -47,4 +47,4 @@ jobs:
         run: |
           IMAGE=registry.abstrax.cn/test/debug-ci:latest
           echo "Pushing $IMAGE"
-          docker push $IMAGE --debug || echo "Push failed"
+          docker push $IMAGE || echo "Push failed"
