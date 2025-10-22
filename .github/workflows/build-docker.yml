@@ -32,13 +32,18 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # # Log in to the container registry
-      # - name: Log in to registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: registry.abstrax.cn
-      #     username: ${{ secrets.REGISTRY_USERNAME }}
-      #     password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Configure Docker to harbor
+        run: |
+          mkdir -p /etc/docekr/certs.d/registry.abstrax.cn
+          echo "${{ secrets.NGINX_CA_CERT }}" > /etc/docker/certs.d/registry.abstrax.cn/ca.crt
+
+      # Log in to the container registry
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.abstrax.cn
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       # Extract unique problem folders from changed files
       - name: Extract problem folders
@@ -69,15 +74,6 @@ jobs:
         run: |
           images=()
 
-          echo "Login to registry" >&2
-          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login $REGISTRY -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
-          if [ $? -ne 0 ]; then
-            echo "Docker login failed" >&2
-            exit 1
-          else
-            echo "Docker login succeeded" >&2
-          fi
-
           # Loop through changed problem folders
           problem_folders="${{ steps.changed-folders.outputs.problem_folders }}"
           echo "Processing problem folders: $problem_folders" >&2
@@ -93,7 +89,7 @@ jobs:
                 echo "Building Docker image for $folder ($image_name)"
                 
                 docker build -t "$REGISTRY/$image_name" "$folder/challenge"
-                docker push "$REGISTRY/$image_name"
+                docker push "$REGISTRY/$image_name" --debug
 
                 images+=("$image_name")
               else
