@@ -1,0 +1,15 @@
+body {
+    background-color: #f4f6f9;
+}
+
+.card {
+    border: none;
+}
+
+.alerts {
+    margin-bottom: 1rem;
+}
+
+code {
+    user-select: all;
+}

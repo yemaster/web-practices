@@ -1,0 +1,9 @@
+services:
+  secretvault:
+    build:
+      context: .
+    container_name: secretvault
+    environment:
+      ICQ_FLAG: flag{test}
+    ports:
+      - "5555:5555"

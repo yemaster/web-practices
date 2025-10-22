@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+{% block title %}Password Vault - Vault{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Add Password</h2>
+                <form method="post" action="{{ url_for('create_password') }}">
+                    <div class="mb-3">
+                        <label class="form-label" for="label">Service</label>
+                        <input class="form-control" type="text" id="label" name="label" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="login">Login</label>
+                        <input class="form-control" type="text" id="login" name="login" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-control" type="text" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="notes">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Welcome, {{ username }}</h2>
+            <a class="btn btn-outline-secondary" href="{{ url_for('logout') }}">Sign Out</a>
+        </div>
+        <div class="table-responsive shadow-sm">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Service</th>
+                        <th scope="col">Login</th>
+                        <th scope="col">Password</th>
+                        <th scope="col">Notes</th>
+                        <th scope="col">Created</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if entries %}
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.label }}</td>
+                        <td>{{ entry.login }}</td>
+                        <td><code>{{ entry.password }}</code></td>
+                        <td>{{ entry.notes or '-' }}</td>
+                        <td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger" type="button" data-delete-id="{{ entry.id }}">Delete</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">No entries yet</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
